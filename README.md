@@ -4,6 +4,15 @@ Usage
 -----
 
 ```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/Lee303/logrus-mail-hook"
+	log "github.com/Sirupsen/logrus"
+)
+
 
 // Initialise mail interface implementation NewAuthMail for plain-text authentication
 mail, err := logrus_mail.NewPlainAuthMail("127.0.0.1", 25, "me@test.com", []string{"you@test.com"}, "me@test.com", "reallystrongpassword")
