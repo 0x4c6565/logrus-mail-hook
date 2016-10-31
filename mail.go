@@ -20,7 +20,7 @@ type Mail interface {
 	Send(entry *logrus.Entry) error
 }
 
-type AuthMail struct {
+type PlainAuthMail struct {
 	host         string
 	port         int
 	from         string
@@ -35,8 +35,8 @@ func init() {
 	rCRLF = regexp.MustCompile(`\r?\n`)
 }
 
-func NewMail(host string, port int, from string, recipients []string, authUser string, authPassword string) (Mail, error) {
-	mail := AuthMail{
+func NewPlainAuthMail(host string, port int, from string, recipients []string, authUser string, authPassword string) (Mail, error) {
+	mail := PlainAuthMail{
 		host:         host,
 		port:         port,
 		from:         from,
@@ -53,7 +53,7 @@ func NewMail(host string, port int, from string, recipients []string, authUser s
 	return mail, nil
 }
 
-func (m AuthMail) Send(entry *logrus.Entry) error {
+func (m PlainAuthMail) Send(entry *logrus.Entry) error {
 	auth := smtp.PlainAuth(
 		"",
 		m.authUser,
@@ -72,7 +72,7 @@ func (m AuthMail) Send(entry *logrus.Entry) error {
 	)
 }
 
-func (m *AuthMail) validateParameters() error {
+func (m *PlainAuthMail) validateParameters() error {
 	// Check if server listens on that port.
 	conn, err := net.DialTimeout("tcp", m.host+":"+strconv.Itoa(m.port), 3*time.Second)
 	if err != nil {
@@ -95,7 +95,7 @@ func (m *AuthMail) validateParameters() error {
 	return nil
 }
 
-func (m *AuthMail) getMessage(entry *logrus.Entry) []byte {
+func (m *PlainAuthMail) getMessage(entry *logrus.Entry) []byte {
 	message := getMessageData(entry)
 	subject := getMessageSubject(entry)
 
