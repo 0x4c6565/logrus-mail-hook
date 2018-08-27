@@ -96,7 +96,8 @@ func (m *PlainAuthMail) validateParameters() error {
 }
 
 func (m *PlainAuthMail) getMessage(entry *logrus.Entry) []byte {
-	message := getMessageData(entry)
+	entryMessage := formatEntryMessage(entry)
+	entryData := formatEntryData(entry)
 	subject := getMessageSubject(entry)
 
 	alloc := 4
@@ -110,15 +111,27 @@ func (m *PlainAuthMail) getMessage(entry *logrus.Entry) []byte {
 	for k, v := range headers {
 		buf.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
 	}
-	buf.WriteString("\r\n")
-	buf.WriteString(message)
+	buf.WriteString("Fields:\r\n")
+	buf.WriteString(entryData)
+	buf.WriteString("Message:\r\n")
+	buf.WriteString(entryMessage)
 	buf.WriteString("\r\n")
 
 	return buf.Bytes()
 }
 
-func getMessageData(entry *logrus.Entry) string {
+func formatEntryMessage(entry *logrus.Entry) string {
 	return rCRLF.ReplaceAllString(entry.Message, "\r\n")
+}
+
+func formatEntryData(entry *logrus.Entry) string {
+	buf := bytes.Buffer{}
+
+	for k, v := range entry.Data {
+		buf.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
+	}
+
+	return buf.String()
 }
 
 func getMessageSubject(entry *logrus.Entry) string {
