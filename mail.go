@@ -13,7 +13,7 @@ import (
 
 	"os"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 type Mail interface {
