@@ -1,6 +1,6 @@
 package logrus_mail
 
-import "github.com/Sirupsen/logrus"
+import "github.com/sirupsen/logrus"
 
 type MailHook struct {
 	mail   Mail
