@@ -3,13 +3,10 @@ package logrus_mail
 import (
 	"bytes"
 	"fmt"
-	"net"
 	"net/mail"
 	"net/smtp"
 	"regexp"
-	"strconv"
 	"strings"
-	"time"
 
 	"os"
 
@@ -73,22 +70,27 @@ func (m PlainAuthMail) Send(entry *logrus.Entry) error {
 }
 
 func (m *PlainAuthMail) validateParameters() error {
-	// Check if server listens on that port.
-	conn, err := net.DialTimeout("tcp", m.host+":"+strconv.Itoa(m.port), 3*time.Second)
-	if err != nil {
-		return fmt.Errorf("Failed to connect to SMTP server [%s]", err)
+	if m.host == "" {
+		return fmt.Errorf("Valid SMTP host must be provided")
 	}
-	defer conn.Close()
+	if m.port < 1 || m.port > 65535 {
+		return fmt.Errorf("Valid SMTP port must be provided")
+	}
+
+	_, err := mail.ParseAddress(m.from)
+	if err != nil {
+		return fmt.Errorf("From address failed validation: %s", err)
+	}
 
 	_, err = mail.ParseAddress(m.from)
 	if err != nil {
-		return fmt.Errorf("From address failed validation [%s]", err)
+		return fmt.Errorf("From address failed validation: %s", err)
 	}
 
 	for _, recipient := range m.recipients {
 		_, err = mail.ParseAddress(recipient)
 		if err != nil {
-			return fmt.Errorf("One or more recipients failed validation [%s]", err)
+			return fmt.Errorf("One or more recipients failed validation: %s", err)
 		}
 	}
 
